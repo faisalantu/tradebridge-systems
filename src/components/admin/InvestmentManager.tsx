@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Pencil, ArrowUpRight, BarChart2, Calendar, Percent } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,7 +30,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
-import { User, Investment } from '@/types';
+import { User, Investment, Currency } from '@/types';
 import { formatCurrency, formatDate, formatPercentage } from '@/utils/formatting';
 
 const formSchema = z.object({
@@ -74,28 +73,29 @@ export function InvestmentManager() {
   });
 
   useEffect(() => {
-    // Simulate API call to get users and investments
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // In a real app, this would be fetch requests to your API
         await new Promise((resolve) => setTimeout(resolve, 1000));
         
-        // Generate mock user data
-        const mockUsers: User[] = Array.from({ length: 10 }, (_, i) => ({
-          id: `user-${i + 1}`,
-          email: `user${i + 1}@example.com`,
-          fullName: `User ${i + 1}`,
-          dateOfBirth: new Date().toISOString(),
-          phoneNumber: `+${Math.floor(Math.random() * 100)} ${Math.floor(Math.random() * 1000000000)}`,
-          currency: ['GBP', 'AUD', 'USD', 'CAD'][Math.floor(Math.random() * 4)] as any,
-          address: `${Math.floor(Math.random() * 100)} Example Street, City, Country`,
-          status: ['pending', 'active', 'suspended'][Math.floor(Math.random() * 3)] as any,
-          balance: Math.random() * 10000,
-          createdAt: new Date().toISOString(),
-        }));
+        const mockUsers: User[] = Array.from({ length: 10 }, (_, i) => {
+          const currencies: Currency[] = ['GBP', 'AUD', 'USD', 'CAD'];
+          const randomCurrency = currencies[Math.floor(Math.random() * currencies.length)];
+          
+          return {
+            id: `user-${i + 1}`,
+            email: `user${i + 1}@example.com`,
+            fullName: `User ${i + 1}`,
+            dateOfBirth: new Date().toISOString(),
+            phoneNumber: `+${Math.floor(Math.random() * 100)} ${Math.floor(Math.random() * 1000000000)}`,
+            currency: randomCurrency,
+            address: `${Math.floor(Math.random() * 100)} Example Street, City, Country`,
+            status: ['pending', 'active', 'suspended'][Math.floor(Math.random() * 3)] as 'pending' | 'active' | 'suspended',
+            balance: Math.random() * 10000,
+            createdAt: new Date().toISOString(),
+          };
+        });
         
-        // Generate mock investment data
         const mockInvestments: Investment[] = Array.from({ length: 15 }, (_, i) => {
           const user = mockUsers[Math.floor(Math.random() * mockUsers.length)];
           const types = ['stock', 'crypto', 'forex', 'commodity'];
@@ -202,7 +202,6 @@ export function InvestmentManager() {
   };
 
   const onAddSubmit = (data: FormValues) => {
-    // In a real app, this would be an API call
     const newInvestment: Investment = {
       id: `inv-${Date.now()}`,
       userId: data.userId,
@@ -231,7 +230,6 @@ export function InvestmentManager() {
   const onEditSubmit = (data: FormValues) => {
     if (!selectedInvestment) return;
     
-    // In a real app, this would be an API call
     const updatedInvestments = investments.map(investment => 
       investment.id === selectedInvestment.id 
         ? { 
@@ -257,9 +255,9 @@ export function InvestmentManager() {
     return user ? user.fullName : 'Unknown User';
   };
 
-  const getUserCurrency = (userId: string): string => {
+  const getUserCurrency = (userId: string): Currency => {
     const user = users.find(u => u.id === userId);
-    return user ? user.currency : 'USD';
+    return user ? user.currency : 'USD' as Currency;
   };
 
   return (
@@ -368,7 +366,6 @@ export function InvestmentManager() {
         </div>
       </CardContent>
       
-      {/* Add Investment Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -563,7 +560,6 @@ export function InvestmentManager() {
         </DialogContent>
       </Dialog>
       
-      {/* Edit Investment Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -733,3 +729,4 @@ export function InvestmentManager() {
     </Card>
   );
 }
+

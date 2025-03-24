@@ -28,7 +28,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { User, Currency, BankDetails } from '@/types';
+import { User, Currency, UserStatus, BankDetails } from '@/types';
 import { formatCurrency, formatDate, getBankDetailsLabels } from '@/utils/formatting';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -91,7 +91,7 @@ export function UserManagement() {
         // Generate mock user data
         const mockUsers: User[] = Array.from({ length: 20 }, (_, i) => {
           const currencies: Currency[] = ['GBP', 'AUD', 'USD', 'CAD'];
-          const statuses: User['status'][] = ['pending', 'active', 'suspended'];
+          const statuses: UserStatus[] = ['pending', 'active', 'suspended'];
           
           return {
             id: `user-${i + 1}`,
@@ -195,7 +195,7 @@ export function UserManagement() {
   const handleActivateUser = (user: User) => {
     // In a real app, this would be an API call
     const updatedUsers = users.map(u => 
-      u.id === user.id ? { ...u, status: 'active' } : u
+      u.id === user.id ? { ...u, status: 'active' as UserStatus } : u
     );
     setUsers(updatedUsers);
     
@@ -208,7 +208,7 @@ export function UserManagement() {
   const handleSuspendUser = (user: User) => {
     // In a real app, this would be an API call
     const updatedUsers = users.map(u => 
-      u.id === user.id ? { ...u, status: 'suspended' } : u
+      u.id === user.id ? { ...u, status: 'suspended' as UserStatus } : u
     );
     setUsers(updatedUsers);
     
